@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Attendance Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .container h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      padding: 0.5rem;
+      border: 2px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    button[type="button"] {
+      background-color: #008CBA;
+      color: white;
+    }
+
+    button[type="button"]:hover {
+      background-color: #007bb5;
+    }
+
+    #logoutButton {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #logoutButton:hover {
+      background-color: #e53935;
+    }
+
+    .location-button {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .location-button:hover {
+      background-color: #fb8c00;
+    }
+  </style>
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function showPosition(position) {
+      document.getElementById("Latitude").value = position.coords.latitude;
+      document.getElementById("Longitude").value = position.coords.longitude;
+    }
+
+    function logEvent(eventType) {
+      const email = document.getElementById("Email").value;
+      const name = document.getElementById("Name").value;
+      const description = document.getElementById("Description").value;
+
+      if (!email || !name) {
+        alert('Please fill in the Email and Name fields before logging in or out.');
+        return;
+      }
+
+      const event = {
+        Email: email,
+        Name: name,
+        Description: description,
+        Latitude: document.getElementById("Latitude").value,
+        Longitude: document.getElementById("Longitude").value
+      };
+
+      if (eventType === 'login') {
+        localStorage.setItem('userEvent', JSON.stringify(event));
+        document.getElementById('Event').value = 'login';
+        alert('Logged in successfully');
+      } else {
+        const storedEvent = JSON.parse(localStorage.getItem('userEvent'));
+        if (storedEvent && storedEvent.Email === email && storedEvent.Name === name) {
+          localStorage.removeItem('userEvent');
+          document.getElementById('Event').value = 'logout';
+          alert('Logged out successfully');
+        } else {
+          alert('Logout failed: User details do not match');
+          return;
+        }
+      }
+
+      document.getElementById('form').submit();
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Attendance Management</h1>
+    <form id="form" action="https://script.google.com/macros/s/AKfycbx1-PWh1pcrQbGJtMtkDzlZCOT0whn8ZpdXW8S1xft_zcND_L6kGrBeJp3axkS6cA5Khg/exec" method="post">
+      <input type="hidden" name="Date" value="">
+      <input id="Email" name="Email" type="email" placeholder="Email" required>
+      <input id="Name" name="Name" type="text" placeholder="Name" required>
+      <input id="Description" name="Description" type="text" placeholder="Description" required>
+      <input type="text" id="Latitude" name="Latitude" placeholder="Latitude">
+      <input type="text" id="Longitude" name="Longitude" placeholder="Longitude">
+      <input type="hidden" id="Login" name="Login">
+      <input type="hidden" id="Logout" name="Logout">
+      <input type="hidden" id="Event" name="Event">
+      <button type="button" class="location-button" onclick="getLocation()">Get Location</button>
+      <button type="button" onclick="logEvent('login')">Login</button>
+      <button type="submit">Send</button>
+      <button type="button" id="logoutButton" onclick="logEvent('logout')">Logout</button>
+    </form>
+  </div>
+</body>
+</html>
